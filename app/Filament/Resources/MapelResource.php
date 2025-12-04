@@ -56,7 +56,7 @@ class MapelResource extends Resource
                 Tables\Columns\TextColumn::make('nama_mapel')
                     ->label('Mata Pelajaran')
                     ->searchable(),
-                Tables\Columns\ToggleColumn::make('mapel_aktif') // Membuat kolom toggle untuk status aktif
+                Tables\Columns\ToggleColumn::make('mapel_aktif')
                     ->label('Aktif'),
                 // Tables\Columns\IconColumn::make('mapel_aktif')
                 //     ->boolean(),
@@ -65,11 +65,11 @@ class MapelResource extends Resource
                     ->dateTime('d M Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true), // Bisa disembunyikan secara default
-                Tables\Columns\TextColumn::make('updated_at') // Membuat kolom untuk tanggal pembaruan
-                    ->label('Diubah Pada')
-                    ->dateTime('d M Y')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                // Tables\Columns\TextColumn::make('updated_at') // Membuat kolom untuk tanggal pembaruan
+                //     ->label('Diubah Pada')
+                //     ->dateTime('d M Y')
+                //     ->sortable()
+                //     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('created_at', 'desc') // Mengatur sorting default berdasarkan tanggal pembuatan
             ->filters([

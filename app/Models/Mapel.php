@@ -12,4 +12,7 @@ class Mapel extends Model
     protected $table = 'mapel'; // Menentukan nama tabel yaitu 'mapel'
     protected $primaryKey = 'id_mapel'; // Menentukan primary key yaitu 'id_mapel'
     protected $guarded = []; // Mengizinkan semua kolom untuk dapat diisi massal
+    protected $casts = [
+        'mapel_aktif' => 'boolean', // Mengubah kolom 'mapel_aktif' menjadi tipe boolean
+    ];
 }

@@ -28,7 +28,7 @@ class User extends Authenticatable
         'email',
         'password',
         'id_roles',
-        'staus',
+        'status',
     ];
 
     /**
@@ -60,8 +60,9 @@ class User extends Authenticatable
         return true;
     }
 
-    public function getNameAttribute() // Menambahkan accessor untuk atribut 'name'
+    public function getNameAttribute(): string // Menambahkan accessor untuk atribut 'name' dan pastikan selalu string
     {
-        return $this->username; // Mengembalikan nilai dari kolom 'username'
+        // Kembalikan username jika ada, jika tidak gunakan email, jika tidak kosongkan string.
+        return (string) ($this->username ?? $this->email ?? '');
     }
 }

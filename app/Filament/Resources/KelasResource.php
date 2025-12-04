@@ -16,21 +16,37 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class KelasResource extends Resource
 {
     protected static ?string $model = Kelas::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $modelLabel = 'Kelas'; // Nama buat tombol dan judul
+    protected static ?string $pluralModelLabel = 'Kelas'; // Nama buat menu sidebar
+    protected static ?string $navigationLabel = 'Kelas'; // Label di navigasi
+    protected static ?string $navigationGroup = 'Data Master'; // Grup di navigasi
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('id_guru')
-                    ->numeric(),
-                Forms\Components\TextInput::make('nama')
-                    ->required()
-                    ->maxLength(100),
-                Forms\Components\TextInput::make('tingkat')
-                    ->required()
-                    ->maxLength(10),
+                Forms\Components\Section::make('Data Kelas') // Membuat section dengan judul
+                ->schema([
+                    // Input untuk memilih wali kelas menggunakan relasi
+                    Forms\Components\Select::make('id_guru')
+                        ->label('Wali Kelas') // Label untuk input
+                        ->relationship('waliKelas', 'nama') // Menggunakan relasi dari model Guru untuk memilih guru
+                        ->searchable()
+                        ->preload(),
+                    Forms\Components\TextInput::make('nama')
+                        ->label('Nama Kelas')
+                        ->required()
+                        ->maxLength(100),
+                    Forms\Components\Select::make('tingkat')
+                        ->label('Tingkat')
+                        ->options([ // Pilihan tingkat kelas
+                            '10' => 'Kelas 10',
+                            '11' => 'Kelas 11',
+                            '12' => 'Kelas 12',
+                        ])
+                        ->required(),
+                ])->columns(2), // Mengatur jumlah kolom dalam section
             ]);
     }
 
@@ -38,12 +54,17 @@ class KelasResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id_guru')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('waliKelas.nama') // Menggunakan relasi untuk menampilkan nama wali kelas
+                    ->label('Wali Kelas')
+                    ->placeholder('Belum ada')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('nama')
+                    ->label('Nama Kelas')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('tingkat')
+                    ->label('Tingkat')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -54,11 +75,13 @@ class KelasResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('nama', 'asc')
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
