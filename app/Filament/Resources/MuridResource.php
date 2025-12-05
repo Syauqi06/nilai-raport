@@ -16,49 +16,76 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class MuridResource extends Resource
 {
     protected static ?string $model = Murid::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $modelLabel = 'Murid'; // Nama buat tombol dan judul
+    protected static ?string $pluralModelLabel = 'Murid'; // Nama buat menu sidebar
+    protected static ?string $navigationLabel = 'Murid'; // Label di navigasi
+    protected static ?string $navigationGroup = 'Data Master'; // Grup di navigasi
+    protected static ?string $navigationIcon = 'heroicon-o-user';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('id_pengguna')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('id_kelas')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('nama')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('nis')
-                    ->required()
-                    ->maxLength(50),
-                Forms\Components\TextInput::make('nisn')
-                    ->required()
-                    ->maxLength(15),
-                Forms\Components\DatePicker::make('tanggal_lahir'),
-            ]);
+                Forms\Components\Section::make('Biodata Murid')
+                ->schema([
+                    Forms\Components\Select::make('id_pengguna') // Relasi ke tabel pengguna untuk login
+                        ->label('Akun Pengguna')
+                        ->relationship('user', 'username') // Menggunakan relasi ke model User untuk memilih username
+                        ->searchable()
+                        ->required(),
+                    Forms\Components\Select::make('id_kelas') // Relasi ke tabel kelas
+                        ->label('Kelas')
+                        ->relationship('kelas', 'nama') // Menggunakan relasi ke model Kelas untuk memilih nama kelas
+                        ->searchable()
+                        ->required()
+                        ->preload(), // Memuat semua opsi saat form dibuka
+                    Forms\Components\TextInput::make('nama')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('nis')
+                        ->label('NIS')
+                        ->numeric()
+                        ->unique(ignoreRecord: true)
+                        ->required(),
+                    Forms\Components\TextInput::make('nisn')
+                        ->label('NISN')
+                        ->numeric()
+                        ->unique(ignoreRecord: true)
+                        ->required(),
+                    Forms\Components\DatePicker::make('tanggal_lahir')
+                        ->label('Tanggal Lahir')
+                        ->displayFormat('d-m-Y')
+                        ->required(),
+            ])->columns(2),
+        ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id_pengguna')
-                    ->numeric()
+                // Tables\Columns\TextColumn::make('id_pengguna')
+                //     ->numeric()
+                //     ->sortable(),
+                // Tables\Columns\TextColumn::make('id_kelas')
+                //     ->numeric()
+                //     ->sortable(),
+                Tables\Columns\TextColumn::make('kelas.nama')
+                    ->label('Kelas')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('id_kelas')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('user.username')
+                    ->label('Akun Login'),
                 Tables\Columns\TextColumn::make('nama')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nis')
+                    ->label('NIS')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nisn')
+                    ->label('NISN')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('tanggal_lahir')
+                    ->label('Tanggal Lahir')
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -75,6 +102,7 @@ class MuridResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
